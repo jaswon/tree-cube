@@ -1,0 +1,81 @@
+<html>
+    <head>
+        <title>Cube Animation</title>
+    </head>
+    <body>
+        <canvas id="main"></canvas>
+    </body>
+    <script charset="utf-8">
+        //get canvas
+        var cvs = document.getElementById("main");
+        var ctx = cvs.getContext("2d");
+        cvs.width = 300;
+        cvs.height = 300;
+
+        var sqrt3 = Math.sqrt(3);
+        var ratio = 2*sqrt3+1;
+        var third = Math.PI*2/3;
+
+        var bounce = 10;
+
+        var angle = .9;
+        var angvel = .01;
+        var size = 150;
+
+        var update = function() {
+            angle += angvel;
+            var p1 = {x:cvs.width/2,y:10}
+            var p2 = {x:cvs.width/2,y:size+10}
+            var p3 = {x:p1.x+size/2.2*Math.sin(angle),y:size/3+bounce*Math.cos(angle)}
+            var p4 = {x:p1.x+size/2.2*Math.sin(angle+third),y:size/3+bounce*Math.cos(angle+third)}
+            var p5 = {x:p1.x+size/2.2*Math.sin(angle+2*third),y:size/3+bounce*Math.cos(angle+2*third)}
+            var p6 = {x:p1.x+size/2.2*Math.sin(angle+third/2),y:size*2/3+bounce*Math.cos(angle+third/2)}
+            var p7 = {x:p1.x+size/2.2*Math.sin(angle+third+third/2),y:size*2/3+bounce*Math.cos(angle+third+third/2)}
+            var p8 = {x:p1.x+size/2.2*Math.sin(angle+2*third+third/2),y:size*2/3+bounce*Math.cos(angle+2*third+third/2)}
+
+            ctx.clearRect(0,0,cvs.width,cvs.height);
+            ctx.beginPath();
+            ctx.moveTo(p1.x,p1.y);
+            ctx.lineTo(p3.x,p3.y);
+            ctx.lineTo(p6.x,p6.y);
+            ctx.lineTo(p4.x,p4.y);
+            ctx.strokeStyle = "red";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(p3.x,p3.y);
+            ctx.lineTo(p8.x,p8.y);
+            ctx.lineTo(p2.x,p2.y);
+            ctx.lineTo(p6.x,p6.y);
+            ctx.strokeStyle = "orange";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(p8.x,p8.y);
+            ctx.lineTo(p5.x,p5.y);
+            ctx.lineTo(p7.x,p7.y);
+            ctx.lineTo(p2.x,p2.y);
+            ctx.strokeStyle = "blue";
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(p5.x,p5.y);
+            ctx.lineTo(p1.x,p1.y);
+            ctx.lineTo(p4.x,p4.y);
+            ctx.lineTo(p7.x,p7.y);
+            ctx.strokeStyle = "green";
+            ctx.stroke();
+
+        }
+
+        var run = function() {
+            //live draw
+            var animate = function() {
+                var exit = window.requestAnimationFrame( animate );
+                update();
+                //if () window.cancelAnimationFrame(exit);
+            }
+            animate();
+        }
+
+        run();
+
+    </script>
+</html>

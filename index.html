@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <title>Cube Solver</title>
+    </head>
+    <body>
+        <canvas id="main"></canvas>
+        <button id="next">next</button>
+    </body>
+    <script charset="utf-8">
+
+        //rAF polyfill
+        (function() {
+            var lastTime = 0;
+            var vendors = ['webkit', 'moz'];
+            for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+                window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+                window.cancelAnimationFrame =
+                  window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+            }
+
+            if (!window.requestAnimationFrame)
+                window.requestAnimationFrame = function(callback, element) {
+                    var currTime = new Date().getTime();
+                    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+                    var id = window.setTimeout(function() { callback(currTime + timeToCall); },
+                      timeToCall);
+                    lastTime = currTime + timeToCall;
+                    return id;
+                };
+
+            if (!window.cancelAnimationFrame)
+                window.cancelAnimationFrame = function(id) {
+                    clearTimeout(id);
+                };
+        }());
+
+        //get canvas
+        var cvs = document.getElementById("main");
+        var ctx = cvs.getContext("2d");
+        cvs.width = 300;
+        cvs.height = 300;
+
+
+        var dirs = ['f','b','l','r','u','d'];
+
+        //maek the cueb
+        var cube = [];
+        var color = ['r','o','b','g','y','w','d'];
+        var ccode = {
+            'r':"#B71234",
+            'o':"#FF5800",
+            'b':"#0046AD",
+            'g':"#009B48",
+            'y':"#FFD500",
+            'w':"#FFFFFF",
+            'd':"#ABABAB"
+        };
+        for (var i = 0; i < 6; i++) {
+            cube[i] = {
+                color: color[i],
+                caps: new Array(9)
+            };
+            for (var j = 0; j < 9; j++) {
+                if ([0,1,2,4].indexOf(j) !== -1) {
+                    cube[i].caps[j] = i;
+                } else {
+                    cube[i].caps[j] = 6;
+                }
+            }
+        }
+
+        //seee the cueb
+        var capdim = 30;
+        var buffer = 5;
+        var facedim = (capdim+buffer)*3;
+        var face = 0;
+        ctx.strokeStyle = "black";
+
+        var drawFace = function(face) {
+            var face = cube[face];
+            for (var i = 0; i < 9 ; i++) {
+                var x = i % 3;
+                var y = Math.floor(i/3);
+                ctx.beginPath();
+                ctx.rect(x*(capdim+buffer)+(cvs.width-facedim)/2,y*(capdim+buffer)+(cvs.height-facedim)/2,capdim,capdim);
+                ctx.closePath();
+                ctx.fillStyle = ccode[color[face.caps[i]]];
+                ctx.fill();
+                ctx.stroke();
+            }
+        }
+
+        drawFace(face);
+
+        var cvsLeft = cvs.offsetLeft, cvsTop = cvs.offsetTop;
+
+        cvs.addEventListener('click', function(event) {
+            var xcoord = event.pageX - cvsLeft,
+                ycoord = event.pageY - cvsTop;
+
+            if (
+                    xcoord > (cvs.width-facedim)/2 &&
+                    xcoord < (cvs.width-facedim)/2+facedim &&
+                    ycoord > (cvs.height-facedim)/2 &&
+                    ycoord < (cvs.height-facedim)/2+facedim
+            ) {
+                var x = Math.floor((xcoord - (cvs.width-facedim)/2)/(capdim+buffer));
+                var y = Math.floor((ycoord - (cvs.height-facedim)/2)/(capdim+buffer));
+                var index = x+3*y;
+                if (cube[face].caps[index] !== 6) {
+                    cube[face].caps[index] = (cube[face].caps[index]+1) % 6;
+                }
+                drawFace(face);
+            }
+        }, false);
+
+        var next = document.getElementById("next");
+        next.addEventListener("click", function() {
+            console.log(cube[face].caps);
+            face++;
+            if (face < 6) {
+                drawFace(face);
+            } else {
+                console.log("solving...");
+                console.log(cube);
+            }
+        })
+
+
+    </script>
+</html>
